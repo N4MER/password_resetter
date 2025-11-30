@@ -6,7 +6,7 @@ from re import Pattern
 import serial
 from serial.serialutil import SerialException
 
-from utils.exceptions import StopBreakException, InterruptBootException
+from utils.exceptions import StopBreakException, InterruptBootException, IncorrectResponseException
 from utils.response_patterns import ResponsePatterns
 
 LOG_LEVEL = logging.DEBUG
@@ -90,7 +90,7 @@ class SerialConnection:
         return final_bytes.decode('utf-8', errors='ignore')
 
 
-    def send(self, command: str, expected_response: Pattern[str]) -> bool:
+    def send(self, command: str, expected_response: Pattern[str]):
         """
         Sends data to the serial connection.
         :param command: Sent command.
@@ -109,11 +109,9 @@ class SerialConnection:
         output = self.read_output()
 
         if not expected_response.search(output):
-            logger.info("Couldn't detect entry to ROMMON")
-            return False
+            raise IncorrectResponseException("Incorrect response received from serial port")
 
-        logger.info("Entered ROMMON")
-        return True
+        logger.info(f"Successfully sent {command} to serial port {self._port}")
 
 
     def interrupt_boot(self, expected_response: Pattern[str] = ResponsePatterns.ROMMON):
@@ -140,11 +138,10 @@ class SerialConnection:
             logger.info("Stopped sending break")
             output = self.read_output(False)
 
-            if expected_response.search(output):
-                logger.info("Entered ROMMON")
-                return True
+            if not expected_response.search(output):
+                logger.error("Failed to interrupt boot")
+                raise InterruptBootException("Failed to interrupt boot")
 
         except StopBreakException:
             logger.info("Interrupt_boot stopped by user")
             raise InterruptBootException("Boot interrupt stopped by user")
-        raise InterruptBootException("Failed to interrupt boot")
