@@ -46,13 +46,12 @@ class SerialConnection:
             logger.error("Failed to open serial port %s: %s", self._port, e)
             return None
         except Exception as e:
-            # Catch any other unexpected configuration errors
             logger.critical("Unexpected error during serial connection setup: %s", e)
             return None
         return serial_connection
 
 
-    def read_output(self, clear_buffer: bool = True, read_timeout: float = 3) -> str:
+    def read_output(self, clear_buffer: bool = True, read_timeout: float = 1) -> str:
         """
         Reads data from the serial connection.
         :param clear_buffer: If true, clears the buffer before reading.
