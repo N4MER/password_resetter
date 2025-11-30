@@ -1,4 +1,3 @@
-import re
 import sys
 import logging
 import time
@@ -7,7 +6,8 @@ from re import Pattern
 import serial
 from serial.serialutil import SerialException
 
-from exceptions import StopBreakException
+from utils.exceptions import StopBreakException, InterruptBootException
+from utils.response_patterns import ResponsePatterns
 
 LOG_LEVEL = logging.DEBUG
 
@@ -117,7 +117,7 @@ class SerialConnection:
         return True
 
 
-    def interrupt_boot(self, expected_response: Pattern[str] = re.compile(r'rommon|rommon.*\d+>|rommon.*>', re.IGNORECASE)):
+    def interrupt_boot(self, expected_response: Pattern[str] = ResponsePatterns.ROMMON):
         """
         Interrupts boot to enter ROMMON.
         :param expected_response: Expected ROMMON prompt.
@@ -147,5 +147,5 @@ class SerialConnection:
 
         except StopBreakException:
             logger.info("Interrupt_boot stopped by user")
-            return False
-        return False
+            raise InterruptBootException("Boot interrupt stopped by user")
+        raise InterruptBootException("Failed to interrupt boot")
