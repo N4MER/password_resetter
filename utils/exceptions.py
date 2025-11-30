@@ -3,3 +3,6 @@ class StopBreakException(Exception):
 
 class InterruptBootException(Exception):
     pass
+
+class IncorrectResponseException(Exception):
+    pass
