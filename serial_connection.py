@@ -90,7 +90,7 @@ class SerialConnection:
         return final_bytes.decode('utf-8', errors='ignore')
 
 
-    def send(self, command: str, expected_response: Pattern[str]):
+    def send(self, command: str, expected_response: Pattern[str] | None):
         """
         Sends data to the serial connection.
         :param command: Sent command.
@@ -108,8 +108,9 @@ class SerialConnection:
 
         output = self.read_output()
 
-        if not expected_response.search(output):
-            raise IncorrectResponseException("Incorrect response received from serial port")
+        if expected_response is not None:
+            if not expected_response.search(output):
+                raise IncorrectResponseException("Incorrect response received from serial port")
 
         logger.info(f"Successfully sent {command} to serial port {self._port}")
 
