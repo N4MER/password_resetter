@@ -90,7 +90,7 @@ class SerialConnection:
         return final_bytes.decode('utf-8', errors='ignore')
 
 
-    def send(self, command: str, expected_response: Pattern[str] | None):
+    def send(self, command: str | None, expected_response: Pattern[str] | None):
         """
         Sends data to the serial connection.
         :param command: Sent command.
@@ -103,8 +103,11 @@ class SerialConnection:
         self._connection.write('\n'.encode())
         #self._connection.write(('end' + '\n').encode())
 
+        command_to_send = command if command is not None else ""
+
         logger.info(f"Sending command {command} to serial port {self._port}")
-        self._connection.write((command + '\n').encode())
+
+        self._connection.write((command_to_send + '\n').encode())
 
         output = self.read_output()
 
