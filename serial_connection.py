@@ -101,7 +101,7 @@ class SerialConnection:
         self._clear_buffer()
 
         self._connection.write('\n'.encode())
-        self._connection.write(('end' + '\n').encode())
+        #self._connection.write(('end' + '\n').encode())
 
         logger.info(f"Sending command {command} to serial port {self._port}")
         self._connection.write((command + '\n').encode())
@@ -114,7 +114,7 @@ class SerialConnection:
         logger.info(f"Successfully sent {command} to serial port {self._port}")
 
 
-    def interrupt_boot(self, expected_response: Pattern[str] = ResponsePatterns.ROMMON):
+    def interrupt_boot(self, expected_response: Pattern[str] | None = ResponsePatterns.ROMMON):
         """
         Interrupts boot to enter ROMMON.
         :param expected_response: Expected ROMMON prompt.
@@ -138,10 +138,12 @@ class SerialConnection:
             logger.info("Stopped sending break")
             output = self.read_output(False)
 
-            if not expected_response.search(output):
-                logger.error("Failed to interrupt boot")
-                raise InterruptBootException("Failed to interrupt boot")
+            if expected_response is not None:
+                if not expected_response.search(output):
+                    logger.error("Failed to interrupt boot")
+                    raise InterruptBootException("Failed to interrupt boot")
 
         except StopBreakException:
             logger.info("Interrupt_boot stopped by user")
             raise InterruptBootException("Boot interrupt stopped by user")
+        logger.info(f"Successfully interrupted boot")
