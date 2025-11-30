@@ -1,0 +1,2 @@
+class StopBreakException(Exception):
+    pass
