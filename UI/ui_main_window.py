@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(15)
         self.verticalLayout.setObjectName("verticalLayout")
         self.configuration_frame = QtWidgets.QFrame(self.centralwidget)
-        self.configuration_frame.setStyleSheet("#port_selection_frame {\n"
+        self.configuration_frame.setStyleSheet(".QFrame {\n"
 "    border: 1px solid black;\n"
 "    background: white;\n"
 "}")

@@ -43,7 +43,7 @@
     <item>
      <widget class="QFrame" name="configuration_frame">
       <property name="styleSheet">
-       <string notr="true">#port_selection_frame {
+       <string notr="true">.QFrame {
 	border: 1px solid black;
 	background: white;
 }</string>
