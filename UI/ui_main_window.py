@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(600, 650)
+        MainWindow.resize(600, 700)
         font = QtGui.QFont()
         font.setFamily("MS Shell Dlg 2")
         MainWindow.setFont(font)
@@ -25,18 +25,19 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setContentsMargins(20, 20, 20, 20)
+        self.verticalLayout.setSpacing(15)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.port_selection_frame = QtWidgets.QFrame(self.centralwidget)
-        self.port_selection_frame.setStyleSheet("#port_selection_frame {\n"
+        self.configuration_frame = QtWidgets.QFrame(self.centralwidget)
+        self.configuration_frame.setStyleSheet("#port_selection_frame {\n"
 "    border: 1px solid black;\n"
 "    background: white;\n"
 "}")
-        self.port_selection_frame.setObjectName("port_selection_frame")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.port_selection_frame)
+        self.configuration_frame.setObjectName("configuration_frame")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.configuration_frame)
         self.verticalLayout_4.setContentsMargins(15, 15, 15, 15)
         self.verticalLayout_4.setSpacing(10)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.com_port_selection_frame = QtWidgets.QFrame(self.port_selection_frame)
+        self.com_port_selection_frame = QtWidgets.QFrame(self.configuration_frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -59,7 +60,7 @@ class Ui_MainWindow(object):
         self.lineEdit.setObjectName("lineEdit")
         self.verticalLayout_5.addWidget(self.lineEdit)
         self.verticalLayout_4.addWidget(self.com_port_selection_frame)
-        self.baud_rate_frame = QtWidgets.QFrame(self.port_selection_frame)
+        self.baud_rate_frame = QtWidgets.QFrame(self.configuration_frame)
         self.baud_rate_frame.setStyleSheet(".QFrame {\n"
 "    border: 1px solid black\n"
 "}")
@@ -78,17 +79,28 @@ class Ui_MainWindow(object):
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.verticalLayout_6.addWidget(self.lineEdit_2)
         self.verticalLayout_4.addWidget(self.baud_rate_frame)
-        self.label_3 = QtWidgets.QLabel(self.port_selection_frame)
+        self.verticalLayout.addWidget(self.configuration_frame)
+        self.password_reset_frame = QtWidgets.QFrame(self.centralwidget)
+        self.password_reset_frame.setStyleSheet("background:white")
+        self.password_reset_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.password_reset_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.password_reset_frame.setObjectName("password_reset_frame")
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.password_reset_frame)
+        self.verticalLayout_7.setSpacing(10)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.label_3 = QtWidgets.QLabel(self.password_reset_frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
         self.label_3.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.label_3.setFont(font)
         self.label_3.setStyleSheet("")
         self.label_3.setObjectName("label_3")
-        self.verticalLayout_4.addWidget(self.label_3)
-        self.verticalLayout.addWidget(self.port_selection_frame)
-        self.privileged_exec_mode_frame = QtWidgets.QFrame(self.centralwidget)
+        self.verticalLayout_7.addWidget(self.label_3)
+        self.privileged_exec_mode_frame = QtWidgets.QFrame(self.password_reset_frame)
         self.privileged_exec_mode_frame.setStyleSheet("#privileged_exec_mode_frame {\n"
 "    border: 1px solid black;\n"
 "    background: white;\n"
@@ -163,8 +175,8 @@ class Ui_MainWindow(object):
         self.encrypt_privileged_exec_mode_password_toggle.setObjectName("encrypt_privileged_exec_mode_password_toggle")
         self.horizontalLayout_3.addWidget(self.encrypt_privileged_exec_mode_password_toggle, 0, QtCore.Qt.AlignRight)
         self.verticalLayout_2.addWidget(self.frame)
-        self.verticalLayout.addWidget(self.privileged_exec_mode_frame)
-        self.line_console_frame = QtWidgets.QFrame(self.centralwidget)
+        self.verticalLayout_7.addWidget(self.privileged_exec_mode_frame)
+        self.line_console_frame = QtWidgets.QFrame(self.password_reset_frame)
         self.line_console_frame.setStyleSheet(" #line_console_frame {\n"
 "    border: 1px solid black;\n"
 "    background: white;\n"
@@ -220,7 +232,8 @@ class Ui_MainWindow(object):
         self.line_console_password_input.setEchoMode(QtWidgets.QLineEdit.Password)
         self.line_console_password_input.setObjectName("line_console_password_input")
         self.verticalLayout_3.addWidget(self.line_console_password_input)
-        self.verticalLayout.addWidget(self.line_console_frame)
+        self.verticalLayout_7.addWidget(self.line_console_frame)
+        self.verticalLayout.addWidget(self.password_reset_frame)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.confirm_frame = QtWidgets.QFrame(self.centralwidget)
