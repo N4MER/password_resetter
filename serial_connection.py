@@ -6,8 +6,7 @@ from re import Pattern
 import serial
 from serial.serialutil import SerialException
 
-from utils.exceptions import StopBreakException, InterruptBootException, IncorrectResponseException
-from utils.response_patterns import ResponsePatterns
+from utils.exceptions import IncorrectResponseException
 
 LOG_LEVEL = logging.DEBUG
 
@@ -16,10 +15,34 @@ logger = logging.getLogger("serial_connection")
 
 class SerialConnection:
 
-    def __init__(self, port: str, baud_rate: int):
+    def __init__(self):
+        self._port = None
+        self._baud_rate = None
+        self._connection = None
+
+    @property
+    def connection(self) -> serial.Serial:
+        return self._connection
+
+    @connection.setter
+    def connection(self, connection: serial.Serial):
+        self._connection = connection
+
+    @property
+    def port(self) -> str | None:
+        return self._port
+
+    @port.setter
+    def port(self, port: str | None):
         self._port = port
+
+    @property
+    def baud_rate(self) -> int:
+        return self._baud_rate
+
+    @baud_rate.setter
+    def baud_rate(self, baud_rate: int):
         self._baud_rate = baud_rate
-        self._connection = self.open_serial_connection()
 
     def _clear_buffer(self):
         """
@@ -36,7 +59,7 @@ class SerialConnection:
         :return: The serial connection.
         """
         try:
-            serial_connection = serial.Serial(port=self._port, baudrate=self._baud_rate)
+            self._connection = serial.Serial(port=self._port, baudrate=self._baud_rate)
 
             self._clear_buffer()
 
@@ -48,22 +71,22 @@ class SerialConnection:
         except Exception as e:
             logger.critical("Unexpected error during serial connection setup: %s", e)
             return None
-        return serial_connection
 
 
-    def read_output(self, clear_buffer: bool = True, read_timeout: float = 1) -> str:
+    def read_until_expected_output(self, expected_response: Pattern[str], read_timeout: float = 5, clear_buffer: bool = True) -> bool:
         """
-        Reads data from the serial connection.
+        Reads data from the serial connection until there is no data read for the duration of read_timeout or until the expected response is received.
+        :param expected_response: Expected response.
         :param clear_buffer: If true, clears the buffer before reading.
         :param read_timeout: Reading stops if no new data is received from the device for this duration (default: 3s).
-        :return: Read data from the serial connection.
+        :return: True if the expected response matches.
         """
         logger.info(f"Starting Read from serial port {self._port}")
 
         if clear_buffer:
             self._clear_buffer()
 
-        full_output = []
+        output = ""
         read_amount = 4096
 
         last_data_time = time.time()
@@ -75,7 +98,10 @@ class SerialConnection:
 
                 last_data_time = time.time()
                 data_bytes = self._connection.read(min(bytes_waiting, read_amount))
-                full_output.append(data_bytes)
+                output += data_bytes.decode('utf-8', errors='ignore')
+
+                if expected_response.search(output):
+                    return True
 
             else:
                 time_since_last_data = time.time() - last_data_time
@@ -85,12 +111,11 @@ class SerialConnection:
                     break
 
                 time.sleep(0.1)
+        logger.info("stopped read")
+        return False
 
-        final_bytes = b"".join(full_output)
-        return final_bytes.decode('utf-8', errors='ignore')
 
-
-    def send(self, command: str | None, expected_response: Pattern[str] | None):
+    def send(self, command: str | None = None, expected_response: Pattern[str] | None = None):
         """
         Sends data to the serial connection.
         :param command: Sent command.
@@ -100,54 +125,22 @@ class SerialConnection:
 
         self._clear_buffer()
 
-        self._connection.write('\n'.encode())
-        #self._connection.write(('end' + '\n').encode())
-
         command_to_send = command if command is not None else ""
 
         logger.info(f"Sending command {command} to serial port {self._port}")
 
         self._connection.write((command_to_send + '\n').encode())
 
-        output = self.read_output()
+        is_response_correct = self.read_until_expected_output(expected_response)
 
-        if expected_response is not None:
-            if not expected_response.search(output):
-                raise IncorrectResponseException("Incorrect response received from serial port")
+        if not is_response_correct:
+            raise IncorrectResponseException("Incorrect response received from serial port.")
 
         logger.info(f"Successfully sent {command} to serial port {self._port}")
 
-
-    def interrupt_boot(self, expected_response: Pattern[str] | None = ResponsePatterns.ROMMON):
+    def close_connection(self):
         """
-        Interrupts boot to enter ROMMON.
-        :param expected_response: Expected ROMMON prompt.
-        :return: True if entered ROMMON.
+        Close the serial connection.
+        :return:
         """
-        try:
-            logger.info("Starting boot interrupt")
-            self._clear_buffer()
-
-            send_break_duration = 0.1
-
-            while True:
-                bytes_waiting = self._connection.in_waiting
-
-                if bytes_waiting > 0:
-                    break
-
-                self._connection.send_break(send_break_duration)
-                time.sleep(0.1)
-
-            logger.info("Stopped sending break")
-            output = self.read_output(False)
-
-            if expected_response is not None:
-                if not expected_response.search(output):
-                    logger.error("Failed to interrupt boot")
-                    raise InterruptBootException("Failed to interrupt boot")
-
-        except StopBreakException:
-            logger.info("Interrupt_boot stopped by user")
-            raise InterruptBootException("Boot interrupt stopped by user")
-        logger.info(f"Successfully interrupted boot")
+        self._connection.close()
