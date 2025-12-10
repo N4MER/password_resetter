@@ -1,10 +1,9 @@
-class ConfigurationCommands:
+class Commands:
+    rename_startup_config_to_default = "rename flash:config.old flash:config.txt"
 
     enable = "enable"
 
     exit = "exit"
-
-    ignore_startup_config = "confreg 0x2142"
 
     reset_config_register_to_default = "config-register 0x2102"
 
@@ -43,3 +42,22 @@ class ConfigurationCommands:
     no = "no"
 
     yes = "yes"
+
+class RouterCommands(Commands):
+    pass
+
+class SwitchCommands(Commands):
+    pass
+
+class ROMMONCommands:
+    ignore_startup_config = "confreg 0x2142"
+
+    reload = "reload"
+
+
+class SwitchBootloaderCommands:
+    initialize_flash = 'flash_init'
+
+    rename_startup_config = "rename flash:config.text flash:config.old"
+
+    boot = 'boot'
