@@ -29,6 +29,8 @@ class Commands:
 
     end = "end"
 
+    copy_config_file_to_running_config = "copy flash:config.txt running-config"
+
     copy_startup_config_to_running_config = "copy startup-config running-config"
 
     copy_running_config_to_startup_config = "copy running-config startup-config"
