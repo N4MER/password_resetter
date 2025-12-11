@@ -51,10 +51,9 @@ class SerialConnectionManager:
         self._connection.reset_output_buffer()
 
 
-    def open_serial_connection(self) -> serial.Serial | None:
+    def open_serial_connection(self):
         """
         Open a serial connection.
-        :return: The serial connection.
         """
         try:
             self._connection = serial.Serial(port=self._port, baudrate=self._baud_rate)
@@ -64,11 +63,9 @@ class SerialConnectionManager:
             logger.info("Opened serial port %s @ %d bps", self._port, self._baud_rate)
 
         except SerialException as e:
-            logger.error("Failed to open serial port %s: %s", self._port, e)
-            return None
+            raise SerialException(e)
         except Exception as e:
-            logger.critical("Unexpected error during serial connection setup: %s", e)
-            return None
+            raise Exception(e)
 
     def read_output(self, read_timeout: float = 5):
         """
