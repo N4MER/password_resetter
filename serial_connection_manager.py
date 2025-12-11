@@ -31,7 +31,9 @@ class SerialConnectionManager:
         return self._port
 
     @port.setter
-    def port(self, port: str | None):
+    def port(self, port: str):
+        if not isinstance(port, str):
+            raise TypeError("Port must be a string.")
         self._port = port
 
     @property
@@ -40,6 +42,8 @@ class SerialConnectionManager:
 
     @baud_rate.setter
     def baud_rate(self, baud_rate: int):
+        if not isinstance(baud_rate, int):
+            raise TypeError("Baud rate must be an integer.")
         self._baud_rate = baud_rate
 
     def _clear_buffer(self):
