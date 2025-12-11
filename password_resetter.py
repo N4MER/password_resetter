@@ -45,6 +45,12 @@ class PasswordResetter:
             raise TypeError("New line console password must be a string")
 
     def reset_password(self, serial_connection_manager: SerialConnectionManager, device: Device):
+        """
+        Resets selected passwords of a given device.
+        :param serial_connection_manager: Serial connection manager.
+        :param device: Target device.
+        :return:
+        """
         logger.info("starting password reset")
 
         PasswordResetter.ignore_startup_config(serial_connection_manager, device)
@@ -111,7 +117,12 @@ class PasswordResetter:
 
     @staticmethod
     def ignore_startup_config(serial_connection_manager: SerialConnectionManager, device: Device):
-
+        """
+        Selects different commands to use based on bootloader used by the target device.
+        :param serial_connection_manager: Serial connection manager.
+        :param device: Target device.
+        :return:
+        """
         if device.boot_environment == BootEnvironment.ROMMON:
             serial_connection_manager.send_command(None, ResponsePatterns.ROMMON)
             serial_connection_manager.send_command(ROMMONCommands.ignore_startup_config, ResponsePatterns.ROMMON)
@@ -146,6 +157,11 @@ class PasswordResetter:
 
     @staticmethod
     def finish_reset(serial_connection_manager: SerialConnectionManager, device: Device):
-
+        """
+        Selects commands to finish password reset based on the bootloader of the target device.
+        :param serial_connection_manager: Serial connection manager.
+        :param device: Target device.
+        :return:
+        """
         if device.boot_environment == BootEnvironment.ROMMON:
             serial_connection_manager.send_command(Commands.reset_config_register_to_default, ResponsePatterns.GLOBAL_CONFIGURATION_MODE)
